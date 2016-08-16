@@ -1,0 +1,54 @@
+{
+	"resourceType": "QuestionnaireResponse",
+	"id": "f201",
+	"subject": {
+		"reference": "Patient/patient_4"
+	},
+	"authored": "2013-06-02",
+	"group": {
+		"linkId": "root",
+		"group": [
+			{
+				"linkId": "general",
+				"question": [
+					{
+						"linkId": "name",
+						"text": "What is your name?",
+						"answer": [
+							{
+								"valueString": "Rachel Chang"
+							}
+						]
+					},
+					{
+						"linkId": "pain",
+						"text": "Pain Level (on scale of 1-10, with 1 being the least)",
+						"answer": [
+							{
+								"valueInteger": 6
+							}
+						]
+					},
+					{
+						"linkId": "advil",
+						"text": "How many times did you take advil this week?",
+						"answer": [
+							{
+								"valueInteger": 1
+							}
+						]
+					},
+					{
+						"linkId": "one_word",
+						"text": "What is one word to describe how you felt this week?",
+						"answer": [
+							{
+								"valueString": "good"
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+}

@@ -1,0 +1,103 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "group": {
+    "linkId": "root",
+    "group": [
+      {
+        "linkId": "1",
+        "question": [
+          {
+            "linkId": "1.1",
+            "_linkId": {
+              "fhir_comments": [
+                "  Seperate answer  "
+              ]
+            },
+            "text": "Who is your favorite person?",
+            "answer": [
+              {
+                "valueString": "Asher!"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "linkId": "2",
+        "_linkId": {
+          "fhir_comments": [
+            "  Answers to general questions  "
+          ]
+        },
+        "title": "General questions",
+        "question": [
+          {
+            "linkId": "2.1",
+            "text": "What is your gender?",
+            "answer": [
+              {
+                "valueString": "Male"
+              }
+            ]
+          },
+          {
+            "linkId": "2.2",
+            "text": "What is your date of birth?",
+            "answer": [
+              {
+                "valueString": "1999-07-31"
+              }
+            ]
+          },
+          {
+            "linkId": "2.3",
+            "text": "What is your age?",
+            "answer": [
+              {
+                "valueInteger": 17
+              }
+            ]
+          },
+          {
+            "linkId": "2.4",
+            "text": "How many siblings do you have?",
+            "answer": [
+              {
+                "valueInteger": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "linkId": "3",
+        "_linkId": {
+          "fhir_comments": [
+            "  Answers to intoxications  "
+          ]
+        },
+        "title": "Intoxications",
+        "question": [
+          {
+            "linkId": "3.1",
+            "text": "Do you smoke?",
+            "answer": [
+              {
+                "valueBoolean": false
+              }
+            ]
+          },
+          {
+            "linkId": "3.2",
+            "text": "What is your favorite food?",
+            "answer": [
+              {
+                "valueString": "Steak"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

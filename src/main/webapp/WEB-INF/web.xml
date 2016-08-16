@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+  version="3.1"
+  metadata-complete="true">
+
+  <display-name>FHIR-Compliant Visualization Tool for Patient Reported Outcomes</display-name>
+  <description>
+     FHIR-Compliant Visualization Tool for Patient Reported Outcomes
+  </description>
+
+  <servlet>
+    <servlet-name>Servlet</servlet-name>
+    <servlet-class>Servlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Servlet</servlet-name>
+    <url-pattern>/fhir/QuestionnaireResponse</url-pattern>
+  </servlet-mapping>
+
+</web-app>
