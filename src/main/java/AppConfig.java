@@ -22,7 +22,7 @@ public class AppConfig {
 
     private static Properties prop = new Properties();
     
-    //Upload the configuration from config.properties files
+    // Upload the configuration from config.properties files
     private static void uploadConfiguration() throws IOException {
         InputStream input = null;
 

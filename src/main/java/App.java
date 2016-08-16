@@ -84,7 +84,7 @@ public class App {
 		return "Uploaded \"" + file + "\" successfully.";
 	}
 	
-	//Automatically creates visualizations based on a visualization configuration file
+	// Automatically creates visualizations based on a visualization configuration file
 	public String visualizeData(String index, File vis_config, File example_data) throws IOException {
 		
 		String response = "";
@@ -145,7 +145,7 @@ public class App {
     	return "Successfully deleted the data";
 	}
 	
-	//Searches Elasticsearch for all QuestionnaireResponse entries in the specified index (and specified type if given)
+	// Searches Elasticsearch for all QuestionnaireResponse entries in the specified index (and specified type if given)
 	public SearchResponse search(String index, String type){
 		
 		SearchResponse search = null;
@@ -541,13 +541,13 @@ public class App {
 		}		
 	}
 	
-	//Creates an JSON object that can be indexed into Elasticsearch
+	// Creates an JSON object that can be indexed into Elasticsearch
 	public XContentBuilder makeJSONObject(ArrayList<ArrayList<Object>> arrayList) {
 		try {
 			
 			XContentBuilder json = jsonBuilder().startObject();
 			
-			//Populates the JSON object with questions as the keys and answers as their values
+			// Populates the JSON object with questions as the keys and answers as their values
 			for (ArrayList<Object> data: arrayList){
 				json.field((String) data.get(0), data.get(1));	
 			}
