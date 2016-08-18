@@ -39,12 +39,8 @@ public class Servlet extends HttpServlet {
 			String type = file_request.getParameter("type");
 			
 			// Error checking
-			if (file == null) {
-				if (vis_config == null) {
-					out.println("File not given");
-				} else {
-					out.println("Example file not given");
-				}
+			if (file == null && vis_config == null) {
+				out.println("File not given");
 				return;
 			} else if (index == null) {
 				out.println("Index not given");
@@ -61,14 +57,20 @@ public class Servlet extends HttpServlet {
 				
 				// Enters the data from the QuestionnaireResponse .json file into Elasticsearch
 				out.println(app.populateFromFile(file, index, type));
-				
+				file.delete();
 			} else {
 				
+				// Makes sure that the index exists
+				String indexExists = indexExists(index);
+				if (indexExists.length() > 3) {
+					out.println(indexExists);
+					return;
+				}
+				
 				// Creates visualizations based on the vis_config file
-				out.println(app.visualizeData(index, vis_config, file));
+				out.println(app.visualizeData(index, vis_config));
 				vis_config.delete();
 			}
-			file.delete();
 		}
 		// If the POST request does not contain a file, then the servlet checks if it is a command
 		else {
@@ -89,18 +91,11 @@ public class Servlet extends HttpServlet {
 			}
 			
 			// Makes sure that the index exists
-			String[] indices = app.client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData().concreteAllIndices();
-			boolean index_exists = false;
-			for (String ind: indices) {
-				if (index.equals(ind)) {
-					index_exists = true;
-				}
-			}
-			if (! index_exists) {
-				out.println("The index \"" + index + "\" does not exist");
+			String indexExists = indexExists(index);
+			if (indexExists.length() > 3) {
+				out.println(indexExists);
 				return;
 			}
-			
 			
 			// Deletes all of the data from the given index with the given type
 			if (command.equals("delete")) {
@@ -148,5 +143,21 @@ public class Servlet extends HttpServlet {
 	// Closes the connection to Elasticsearch when destroying the Servlet
 	public void destroy() {
 		app.client.close();
+	}
+	
+	public String indexExists(String index) {
+		// Makes sure that the index exists
+		String[] indices = app.client.admin().cluster().prepareState().execute().actionGet().getState().getMetaData()
+				.concreteAllIndices();
+		boolean index_exists = false;
+		for (String ind : indices) {
+			if (index.equals(ind)) {
+				index_exists = true;
+			}
+		}
+		if (!index_exists) {
+			return "The index \"" + index + "\" does not exist";
+		}
+		return "";
 	}
 }

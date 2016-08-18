@@ -92,12 +92,11 @@ Parameters:
 
 **To generate visualizations in Kibana**:
 
-	curl 'yourhost/visualize/fhir/QuestionnaireResponse' --form 'vis_config=@vis_config.json' --form 'file=@example_file.json' --form 'index=example_index'
+	curl 'yourhost/visualize/fhir/QuestionnaireResponse' --form 'vis_config=@example_vis_config.json' --form 'index=example_index'
 
 Parameters:
 
 * Vis_config: A JSON file that specifies the visualizations you want to generate
-* File: A JSON file that contains an example of the surveys that you want to visualize
 * Index: The index where the data for the visualizations is located
 
 Example vis_config file (for an in-depth guide, go to the ** Visual Configuration Parameters and Explanation** section):

@@ -82,30 +82,24 @@ public class App {
 		client.prepareIndex(index, type).setSource(json).get();
 
 		return "Uploaded \"" + file + "\" successfully.";
+		
 	}
 	
 	// Automatically creates visualizations based on a visualization configuration file
-	public String visualizeData(String index, File vis_config, File example_data) throws IOException {
+	public String visualizeData(String index, File vis_config) throws IOException {
 		
 		String response = "";
 		
 		if (vis_config.length() == 0) {
 			return "The vis_config file is empty";
-		} else if (example_data.length() == 0) {
-			return "The example_data file is empty";
 		} else if (!vis_config.getName().endsWith("json")) {
 			return "\"" + vis_config + "\" is not a JSON file.";
-		} else if (!example_data.getName().endsWith("json")) {
-			return "\"" + example_data + "\" is not a JSON file.";
 		}
 		
-		// Retrieves the linkId of each question by referring to an example of the survey
-		FileReader fr = new FileReader(example_data);
-		ArrayList<ArrayList<Object>> sample_survey_data = parseQuestionnaireResponse(fr);
-		
-		if (sample_survey_data.size() == 0) {
-			return "Cannot parse the file \"" + example_data + "\"";
-		}
+		JSONArray hits = getSurveyData(index, null);
+		JSONObject example = (JSONObject) hits.get(0);
+		JSONObject source = (JSONObject) example.get("_source");
+		Object[] keys = source.keySet().toArray();
 		
 		JSONObject jsonObject = null;
 		try {
@@ -114,19 +108,15 @@ public class App {
 			return "Cannot parse the file \"" + vis_config + "\"";
 		}
 		
-		ArrayList<String> questions = new ArrayList<String>();
-		for (ArrayList<Object> question_data: sample_survey_data) {
-			questions.add((String) question_data.get(0));
-		}
-		
 		Object[] links = jsonObject.keySet().toArray();
 		for (Object link: links) {
 			boolean created = false;
-			for (ArrayList<Object> question_data: sample_survey_data) {
+			for (Object key: keys) {
+				
 				// If the linkId of a question matches a linkId in the vis_config file, a visualization is made
-				if (link.equals(question_data.get(question_data.size()-1))) {
-					String question = (String) question_data.get(0);
-					response += createVisualization(index, question, (JSONObject) jsonObject.get(link), questions);
+				String linkId = (String) key;
+				if (link.equals(linkId)) {
+					response += createVisualization(index, linkId, (JSONObject) jsonObject.get(link), keys);
 					created = true;
 				}
 			}
@@ -229,7 +219,7 @@ public class App {
 	}
 	
 	// Generates a visualization in Kibana
-	public String createVisualization(String index, String question, JSONObject vis_config, ArrayList<String> questions) {
+	public String createVisualization(String index, String linkId, JSONObject vis_config, Object[] keys) {
 		
 		String response = "";
 		
@@ -243,11 +233,11 @@ public class App {
 			// Generates a visualization based on the type of visualization
 			String visState = "";
 			if (vis_type.startsWith("line")) {
-				visState = createLineGraph(question, vis_info);
+				visState = createLineGraph(linkId, vis_info);
 			} else if (vis_type.startsWith("bar")) {
-				visState = createBarGraph(question, vis_info);
+				visState = createBarGraph(linkId, vis_info);
 			} else if (vis_type.startsWith("pie")) {
-				visState = createPieChart(question, vis_info);
+				visState = createPieChart(linkId, vis_info);
 			} else {
 				response += "The visualization type \"" + vis_type + "\" is not supported.\n";
 				continue;
@@ -262,7 +252,13 @@ public class App {
 			
 			String splitBy = (String) vis_info.get("splitBy");
 			if (splitBy != null) {
-				if (! questions.contains(splitBy)) {
+				boolean valid = false;
+				for (Object key: keys) {
+					if (key.toString().equals(splitBy)) {
+						valid = true;
+					}
+				}
+				if (! valid) {
 					response += "\"" + name + "\": The value entered in the \"splitBy\" field is not valid.\n";
 					continue;
 				}
@@ -503,7 +499,6 @@ public class App {
 				
 				// Once the method has found an answer, it finds the answer's corresponding question and linkId
 				String linkId = (String) jObj.get("linkId");
-				String question_text = (String) jObj.get("text");
 
 				// Finds the value of the answer
 				JSONArray answer = (JSONArray) jObj.get("answer");
@@ -512,7 +507,15 @@ public class App {
 				Object answer_obj = (Object) inner_answer.get(valueType);
 				
 				// Finds the answer value in the case that the answer is more complex than just a string or number
-				if (answer_obj.getClass().toString().equals("class org.json.simple.JSONObject")) {
+				if (valueType.equals("valueQuantity")) {
+					JSONObject valueQuantity = (JSONObject) answer_obj;
+					String values = "";
+					for (Object key: valueQuantity.keySet().toArray()) {
+						values += valueQuantity.get(key) + ", ";
+					}
+					values = values.substring(0, values.length() - 2);
+					answer_obj = values;
+				} else if (answer_obj.getClass().toString().equals("class org.json.simple.JSONObject")) {
 					
 					JSONObject answer_jObj = (JSONObject) answer_obj;
 					if (answer_jObj.containsKey("display")) {
@@ -526,9 +529,8 @@ public class App {
 								
 				// Saves the desired data in a small list, which is then put into the larger list
 				ArrayList<Object> answer_data = new ArrayList<Object>();
-				answer_data.add(question_text);
-				answer_data.add(answer_obj);
 				answer_data.add(linkId);
+				answer_data.add(answer_obj);
 				survey_data.add(answer_data);
 				
 				// Continues to find more answers if there are conditional questions based on this answer
